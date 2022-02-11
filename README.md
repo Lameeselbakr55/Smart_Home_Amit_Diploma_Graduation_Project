@@ -12,7 +12,7 @@ Simple Smart Home for Amit Learning Embedded System Diploma
 When master recievs 1 through UART , it sends to slave to turn lamp 1 on. Also, when master recievs 2 , it sends to slave to turn lamp 2 on. but when  master recievs 3 , it sends to slave to turn lamp 3 on. Finally when master recievs 4 , it sends to slave to turn motor on. otherwise all devices turned off
 
 
-## to open and operate project 
+## To open and run this project 
 
 1. Open proteus file attached 
 2. Put master file . hex on master controller   ( in this case  HomeAutomation.hex )
