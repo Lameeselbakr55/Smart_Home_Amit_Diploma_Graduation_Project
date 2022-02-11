@@ -1,0 +1,253 @@
+
+SPI_SLAVE.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000134  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  00000188  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  00000188  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001b8  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000048  00000000  00000000  000001f4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   000007d8  00000000  00000000  0000023c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 00000644  00000000  00000000  00000a14  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000003b4  00000000  00000000  00001058  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000058  00000000  00000000  0000140c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000355  00000000  00000000  00001464  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    0000017e  00000000  00000000  000017b9  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000028  00000000  00000000  00001937  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 36 00 	call	0x6c	; 0x6c <main>
+  64:	0c 94 98 00 	jmp	0x130	; 0x130 <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <main>:
+
+
+
+int main(void)
+{
+    slave_init();
+  6c:	0e 94 8d 00 	call	0x11a	; 0x11a <slave_init>
+	SET_BIT(DDRC,2);          // LED0
+  70:	a2 9a       	sbi	0x14, 2	; 20
+	SET_BIT(DDRC,7);         // LED1
+  72:	a7 9a       	sbi	0x14, 7	; 20
+	SET_BIT(DDRD,3);        // LED2
+  74:	8b 9a       	sbi	0x11, 3	; 17
+    SET_BIT(DDRA,2);       // relay
+  76:	d2 9a       	sbi	0x1a, 2	; 26
+    
+	while (1) 
+    {
+		unsigned char data_rev=SPI_Transfer(0);
+  78:	80 e0       	ldi	r24, 0x00	; 0
+  7a:	0e 94 93 00 	call	0x126	; 0x126 <SPI_Transfer>
+		if (data_rev=='1')
+  7e:	81 33       	cpi	r24, 0x31	; 49
+  80:	71 f4       	brne	.+28     	; 0x9e <main+0x32>
+		{
+			SET_BIT(PORTC,2);
+  82:	aa 9a       	sbi	0x15, 2	; 21
+			CLEAR_BIT(PORTC,7);
+  84:	af 98       	cbi	0x15, 7	; 21
+			CLEAR_BIT(PORTD,3);
+  86:	93 98       	cbi	0x12, 3	; 18
+			CLEAR_BIT(PORTA,2);		
+  88:	da 98       	cbi	0x1b, 2	; 27
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  8a:	2f ef       	ldi	r18, 0xFF	; 255
+  8c:	81 ee       	ldi	r24, 0xE1	; 225
+  8e:	94 e0       	ldi	r25, 0x04	; 4
+  90:	21 50       	subi	r18, 0x01	; 1
+  92:	80 40       	sbci	r24, 0x00	; 0
+  94:	90 40       	sbci	r25, 0x00	; 0
+  96:	e1 f7       	brne	.-8      	; 0x90 <main+0x24>
+  98:	00 c0       	rjmp	.+0      	; 0x9a <main+0x2e>
+  9a:	00 00       	nop
+  9c:	ed cf       	rjmp	.-38     	; 0x78 <main+0xc>
+		   _delay_ms(100);
+		
+		}
+		else if (data_rev=='2')
+  9e:	82 33       	cpi	r24, 0x32	; 50
+  a0:	71 f4       	brne	.+28     	; 0xbe <main+0x52>
+		{
+			CLEAR_BIT(PORTC,2);
+  a2:	aa 98       	cbi	0x15, 2	; 21
+			SET_BIT(PORTC,7);
+  a4:	af 9a       	sbi	0x15, 7	; 21
+			CLEAR_BIT(PORTD,3);
+  a6:	93 98       	cbi	0x12, 3	; 18
+			CLEAR_BIT(PORTA,2);
+  a8:	da 98       	cbi	0x1b, 2	; 27
+  aa:	2f ef       	ldi	r18, 0xFF	; 255
+  ac:	81 ee       	ldi	r24, 0xE1	; 225
+  ae:	94 e0       	ldi	r25, 0x04	; 4
+  b0:	21 50       	subi	r18, 0x01	; 1
+  b2:	80 40       	sbci	r24, 0x00	; 0
+  b4:	90 40       	sbci	r25, 0x00	; 0
+  b6:	e1 f7       	brne	.-8      	; 0xb0 <main+0x44>
+  b8:	00 c0       	rjmp	.+0      	; 0xba <main+0x4e>
+  ba:	00 00       	nop
+  bc:	dd cf       	rjmp	.-70     	; 0x78 <main+0xc>
+			_delay_ms(100);			
+        }
+		else if (data_rev=='3')
+  be:	83 33       	cpi	r24, 0x33	; 51
+  c0:	71 f4       	brne	.+28     	; 0xde <main+0x72>
+		{
+			CLEAR_BIT(PORTC,2);
+  c2:	aa 98       	cbi	0x15, 2	; 21
+			CLEAR_BIT(PORTC,7);
+  c4:	af 98       	cbi	0x15, 7	; 21
+			SET_BIT(PORTD,3);
+  c6:	93 9a       	sbi	0x12, 3	; 18
+			CLEAR_BIT(PORTA,2);
+  c8:	da 98       	cbi	0x1b, 2	; 27
+  ca:	2f ef       	ldi	r18, 0xFF	; 255
+  cc:	81 ee       	ldi	r24, 0xE1	; 225
+  ce:	94 e0       	ldi	r25, 0x04	; 4
+  d0:	21 50       	subi	r18, 0x01	; 1
+  d2:	80 40       	sbci	r24, 0x00	; 0
+  d4:	90 40       	sbci	r25, 0x00	; 0
+  d6:	e1 f7       	brne	.-8      	; 0xd0 <main+0x64>
+  d8:	00 c0       	rjmp	.+0      	; 0xda <main+0x6e>
+  da:	00 00       	nop
+  dc:	cd cf       	rjmp	.-102    	; 0x78 <main+0xc>
+			_delay_ms(100);			
+        }
+		else if (data_rev=='4')
+  de:	84 33       	cpi	r24, 0x34	; 52
+  e0:	71 f4       	brne	.+28     	; 0xfe <main+0x92>
+		{
+			CLEAR_BIT(PORTC,2);
+  e2:	aa 98       	cbi	0x15, 2	; 21
+			CLEAR_BIT(PORTC,7);
+  e4:	af 98       	cbi	0x15, 7	; 21
+			CLEAR_BIT(PORTD,3);
+  e6:	93 98       	cbi	0x12, 3	; 18
+			SET_BIT(PORTA,2);
+  e8:	da 9a       	sbi	0x1b, 2	; 27
+  ea:	2f ef       	ldi	r18, 0xFF	; 255
+  ec:	81 ee       	ldi	r24, 0xE1	; 225
+  ee:	94 e0       	ldi	r25, 0x04	; 4
+  f0:	21 50       	subi	r18, 0x01	; 1
+  f2:	80 40       	sbci	r24, 0x00	; 0
+  f4:	90 40       	sbci	r25, 0x00	; 0
+  f6:	e1 f7       	brne	.-8      	; 0xf0 <main+0x84>
+  f8:	00 c0       	rjmp	.+0      	; 0xfa <main+0x8e>
+  fa:	00 00       	nop
+  fc:	bd cf       	rjmp	.-134    	; 0x78 <main+0xc>
+			_delay_ms(100);
+		}
+		else
+		{
+			CLEAR_BIT(PORTC,2);
+  fe:	aa 98       	cbi	0x15, 2	; 21
+			CLEAR_BIT(PORTC,7);
+ 100:	af 98       	cbi	0x15, 7	; 21
+			CLEAR_BIT(PORTD,3);
+ 102:	93 98       	cbi	0x12, 3	; 18
+			CLEAR_BIT(PORTA,2);
+ 104:	da 98       	cbi	0x1b, 2	; 27
+ 106:	2f ef       	ldi	r18, 0xFF	; 255
+ 108:	81 ee       	ldi	r24, 0xE1	; 225
+ 10a:	94 e0       	ldi	r25, 0x04	; 4
+ 10c:	21 50       	subi	r18, 0x01	; 1
+ 10e:	80 40       	sbci	r24, 0x00	; 0
+ 110:	90 40       	sbci	r25, 0x00	; 0
+ 112:	e1 f7       	brne	.-8      	; 0x10c <main+0xa0>
+ 114:	00 c0       	rjmp	.+0      	; 0x116 <main+0xaa>
+ 116:	00 00       	nop
+ 118:	af cf       	rjmp	.-162    	; 0x78 <main+0xc>
+
+0000011a <slave_init>:
+ */ 
+
+#include "SPI.h"
+
+void slave_init() {
+		SPCR|=(1<<SPE);
+ 11a:	6e 9a       	sbi	0x0d, 6	; 13
+		DDRB|=(1<<MISO);
+ 11c:	be 9a       	sbi	0x17, 6	; 23
+		DDRB&=~(1<<MOSI);
+ 11e:	bd 98       	cbi	0x17, 5	; 23
+		DDRB&=~(1<<SCK);
+ 120:	bf 98       	cbi	0x17, 7	; 23
+		DDRB&=~(1<<SS);	
+ 122:	bc 98       	cbi	0x17, 4	; 23
+ 124:	08 95       	ret
+
+00000126 <SPI_Transfer>:
+}
+
+unsigned char SPI_Transfer(unsigned char data) {
+	
+	SPDR=data;
+ 126:	8f b9       	out	0x0f, r24	; 15
+	while(!(SPSR&(1<<SPIF)));
+ 128:	77 9b       	sbis	0x0e, 7	; 14
+ 12a:	fe cf       	rjmp	.-4      	; 0x128 <SPI_Transfer+0x2>
+	return SPDR;
+ 12c:	8f b1       	in	r24, 0x0f	; 15
+	
+}
+ 12e:	08 95       	ret
+
+00000130 <_exit>:
+ 130:	f8 94       	cli
+
+00000132 <__stop_program>:
+ 132:	ff cf       	rjmp	.-2      	; 0x132 <__stop_program>
